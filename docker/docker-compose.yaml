@@ -1,0 +1,72 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: ubuntu_pg15_datalen
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: xxxxx
+      POSTGRES_PASSWORD: xxxxx
+      POSTGRES_DB: test
+    volumes:
+      - /opt/pgdata:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1g
+    networks:
+        - ch_ntw
+    command: ["systemctl", "start", "postgresql"]
+
+  nifi:
+    image: apache/nifi
+    ports:
+      - "8443:8443"
+    environment:
+      NIFI_JVM_HEAP_INIT: 12g
+      NIFI_JVM_HEAP_MAX: 12g
+      NIFI_WEB_HTTPS_PORT: 8443
+      NIFI_WEB_PROXY_HOST: 'XXXXXX:8443'
+      SINGLE_USER_CREDENTIALS_USERNAME: admin1
+      SINGLE_USER_CREDENTIALS_PASSWORD: c2tsBtRBKHRAx69EqUghvvgEvjnaLjFEB579
+    deploy:
+      resources:
+        limits:
+          cpus: '6'
+          memory: 16g
+    volumes:
+      - /home/de-s/nifi/postgresql-42.5.3.jar:/opt/nifi/nifi-current/lib/postgresql-42.5.3.jar
+    networks:
+        - ch_ntw
+
+  clickhouse:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+    volumes:
+      - /home/de-s/some_clickhouse_databas:/var/lib/clickhouse
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8g
+    networks:
+        - ch_ntw
+
+  ch_client:
+    image: yandex/clickhouse-client
+    entrypoint:
+      - /bin/sleep
+    command:
+      - infinity
+    networks:
+        - ch_ntw
+
+networks:
+  ch_ntw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.222.1.0/24
