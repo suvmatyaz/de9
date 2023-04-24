@@ -37,7 +37,7 @@ services:
           cpus: '6'
           memory: 16g
     volumes:
-      - /home/de-s/nifi/postgresql-42.5.3.jar:/opt/nifi/nifi-current/lib/postgresql-42.5.3.jar
+      - /opt/nifi/postgresql-42.5.3.jar:/opt/nifi/nifi-current/lib/postgresql-42.5.3.jar
     networks:
         - ch_ntw
 
@@ -46,7 +46,7 @@ services:
     ports:
       - "8123:8123"
     volumes:
-      - /home/de-s/some_clickhouse_databas:/var/lib/clickhouse
+      - /opt/some_clickhouse_databas:/var/lib/clickhouse
     deploy:
       resources:
         limits:
